@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Article } from '../../articles/entities/article.entity';
 
 export enum UserRole {
   USER = 'USER',
@@ -21,4 +22,7 @@ export class User {
 
   @Column({ nullable: true })
   refreshToken: string | null;
+
+  @OneToMany(() => Article, (article) => article.author)
+  articles: Article[];
 }

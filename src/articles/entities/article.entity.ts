@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class Article {
@@ -22,4 +23,7 @@ export class Article {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.articles, { onDelete: 'CASCADE' })
+  author: User;
 }
