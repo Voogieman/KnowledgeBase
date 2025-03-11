@@ -4,6 +4,7 @@ import { In, Repository } from 'typeorm';
 import { Article } from './entities/article.entity';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
+import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { UserRole } from '../users/entities/user.entity';
 
@@ -12,12 +13,11 @@ export class ArticlesService {
   constructor(
     @InjectRepository(Article)
     private articlesRepository: Repository<Article>,
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private usersService: UsersService,
   ) {}
 
   async create(createArticleDto: CreateArticleDto, userId: string): Promise<Article> {
-    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    const user = await this.usersService.findById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
