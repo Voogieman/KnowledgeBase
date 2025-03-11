@@ -26,6 +26,7 @@ async function bootstrap() {
     .setTitle('NestJS API')
     .setDescription('API documentation for the NestJS application')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, configApi);
   SwaggerModule.setup('api', app, document);

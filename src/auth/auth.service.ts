@@ -33,10 +33,14 @@ export class AuthService {
     const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS) || 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    return this.usersService.create({
+    const user = await this.usersService.create({
       ...createUserDto,
       password: hashedPassword,
     });
+
+    // Удаляем пароль и refreshToken перед возвратом
+    const { password: _, refreshToken: __, ...safeUser } = user;
+    return safeUser;
   }
 
   async login(loginDto: LoginDto): Promise<AuthTokensDto> {

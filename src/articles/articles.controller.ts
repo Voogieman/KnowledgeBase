@@ -4,6 +4,7 @@ import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { Article } from './entities/article.entity';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('articles')
 export class ArticlesController {
@@ -11,6 +12,7 @@ export class ArticlesController {
 
   @Post()
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async create(@Body() createArticleDto: CreateArticleDto, @Request() req: any): Promise<Article> {
     return this.articlesService.create(createArticleDto, req.user.id);
   }
@@ -28,6 +30,7 @@ export class ArticlesController {
 
   @Put(':id')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async update(@Param('id') id: number, @Body() updateArticleDto: UpdateArticleDto, @Request() req: any): Promise<void> {
     const user = req.user;
     return this.articlesService.update(id, updateArticleDto, user);
@@ -35,6 +38,7 @@ export class ArticlesController {
 
   @Delete(':id')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async remove(@Param('id') id: number, @Request() req: any): Promise<void> {
     const user = req.user;
     return this.articlesService.remove(id, user);

@@ -5,7 +5,7 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { LoginDto } from './dto/login.dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -33,6 +33,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Обновление токена доступа' })
   @ApiResponse({ status: 200, description: 'Новый токен доступа', type: AuthTokensDto })
   @ApiResponse({ status: 401, description: 'Неверный refresh-токен' })
+  @ApiBearerAuth()
   async refreshToken(@Body() refreshTokenDto: RefreshTokenDto): Promise<AuthTokensDto> {
     return this.authService.refreshToken(refreshTokenDto);
   }
