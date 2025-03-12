@@ -39,7 +39,7 @@ export class UsersService {
     await this.usersRepository.remove(user);
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto, requestUser: User): Promise<User> {
+  async update(id: string, updateUserDto: UpdateUserDto, requestUser: User): Promise<{ message: string}> {
     const userToUpdate = await this.findById(id);
 
     // Проверяем права доступа
@@ -61,7 +61,9 @@ export class UsersService {
 
     await this.usersRepository.update(id, updateFields);
 
-    return this.findById(id);
+    return {
+      message: 'Данные успешно обновлены'
+    }
   }
 
 

@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import { User } from '../users/entities/user.entity';
+import { User, UserRole } from '../users/entities/user.entity';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { AuthTokensDto } from './dto/auth-tokens.dto';
 import { LoginDto } from './dto/login.dto';
@@ -101,4 +101,17 @@ export class AuthService {
     return user;
   }
 
+  public async decodeToken(authHeader?: string): Promise<{ userId?: string; role?: UserRole }> {
+    if (!authHeader) {
+      return {}; // Если заголовка нет, пользователь неавторизован
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    try {
+      const decoded = await this.jwtService.verifyAsync(token);
+      return { userId: decoded.id, role: decoded.role };
+    } catch (err) {
+      return {}; // Возвращаем пустой объект, а не выбрасываем исключение
+    }
+  }
 }
