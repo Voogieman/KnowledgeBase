@@ -61,28 +61,24 @@ export class AuthService {
     return { access_token: accessToken, refresh_token: refreshToken };
   }
 
-  async refreshToken(refreshTokenDto: RefreshTokenDto): Promise<AuthTokensDto> {
-    const { refreshToken, email } = refreshTokenDto;
+  async refreshToken(user): Promise<{ access_token: string; refresh_token: string }> {
+    const tokens = await this.generateTokens(user.email, user.id);
 
-    const user = await this.usersService.findByEmail(email);
-    if (!user) {
-      throw new UnauthorizedException('User not found');
-    }
+    // Хешируем новый refresh-токен перед сохранением
+    await this.usersService.updateRefreshToken(user.id, await bcrypt.hash(tokens.refresh_token, 10));
 
-    const isValid = await bcrypt.compare(refreshToken, user.refreshToken);
-    if (!isValid) {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-
-    const payload = { email: user.email, sub: user.id }; // Используем user.id как sub для идентификации
-    const newAccessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
-    const newRefreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
-
-    const hashedRefreshToken = await bcrypt.hash(newRefreshToken, 10);
-    await this.usersService.updateRefreshToken(user.email, hashedRefreshToken);
-
-    return { access_token: newAccessToken, refresh_token: newRefreshToken };
+    return tokens;
   }
+
+  private async generateTokens(email: string, userId: number) {
+    const payload = { email, sub: userId };
+
+    return {
+      access_token: this.jwtService.sign(payload, { expiresIn: '15m' }),
+      refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
+    };
+  }
+
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);

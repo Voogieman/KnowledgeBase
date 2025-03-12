@@ -1,11 +1,11 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthTokensDto } from './dto/auth-tokens.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { LoginDto } from './dto/login.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -34,7 +34,8 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Новый токен доступа', type: AuthTokensDto })
   @ApiResponse({ status: 401, description: 'Неверный refresh-токен' })
   @ApiBearerAuth()
-  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto): Promise<AuthTokensDto> {
-    return this.authService.refreshToken(refreshTokenDto);
+  @ApiBody({ type: RefreshTokenDto }) // Добавляем `refreshToken` в Swagger
+  async refreshToken(@Body() body: RefreshTokenDto, @Req() request): Promise<AuthTokensDto> {
+    return this.authService.refreshToken(request.user);
   }
 }
