@@ -5,7 +5,6 @@ import { User } from '../users/entities/user.entity';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { AuthTokensDto } from './dto/auth-tokens.dto';
 import { LoginDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto'; // DTO для refresh токена
 
 import * as bcrypt from 'bcrypt';
 
@@ -51,7 +50,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { email, sub: user.id };
+    const payload = { email, sub: user.id, role: user.role };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
@@ -62,7 +61,7 @@ export class AuthService {
   }
 
   async refreshToken(user): Promise<{ access_token: string; refresh_token: string }> {
-    const tokens = await this.generateTokens(user.email, user.id);
+    const tokens = await this.generateTokens(user);
 
     // Хешируем новый refresh-токен перед сохранением
     await this.usersService.updateRefreshToken(user.id, await bcrypt.hash(tokens.refresh_token, 10));
@@ -70,8 +69,8 @@ export class AuthService {
     return tokens;
   }
 
-  private async generateTokens(email: string, userId: number) {
-    const payload = { email, sub: userId };
+  private async generateTokens(user: User) {
+    const payload = { email: user.email, sub: user.id, role: user.role };
 
     return {
       access_token: this.jwtService.sign(payload, { expiresIn: '15m' }),
