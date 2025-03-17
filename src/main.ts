@@ -31,8 +31,13 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, configApi);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000);
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  });
 
+
+  await app.listen(3000);
+  console.log(`🚀 Monolith app is running on: http://localhost:3000/api`);
 }
 
 bootstrap();

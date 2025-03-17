@@ -5,6 +5,7 @@ import configuration from './config/configuration'; // Здесь загружа
 import { UsersModule } from './users/users.module';
 import { ArticlesModule } from './articles/articles.module';
 import { AuthModule } from './auth/auth.module';
+import { AnalyticsClientModule } from './analytics-client/analytics-client.module';
 
 
 console.log('config', configuration);
@@ -28,6 +29,7 @@ console.log('config', configuration);
     AuthModule,
     UsersModule,
     ArticlesModule,
+    AnalyticsClientModule
   ],
 })
 export class AppModule {}

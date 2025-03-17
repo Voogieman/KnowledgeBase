@@ -7,6 +7,7 @@ import { AuthTokensDto } from './dto/auth-tokens.dto';
 import { LoginDto } from './dto/login.dto';
 
 import * as bcrypt from 'bcrypt';
+import { AnalyticsClientService } from '../analytics-client/analytics-client.service';
 
 console.log('AuthService загружен');
 
@@ -16,6 +17,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly analyticsClient: AnalyticsClientService
   ) {}
 
   async register(createUserDto: CreateUserDto): Promise<Omit<User, 'password' | 'refreshToken'>> {
@@ -39,6 +41,10 @@ export class AuthService {
 
     // Удаляем пароль и refreshToken перед возвратом
     const { password: _, refreshToken: __, ...safeUser } = user;
+
+    // отправка события
+    this.analyticsClient.emitEvent('user.registered', user);
+
     return safeUser;
   }
 
